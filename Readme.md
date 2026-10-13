@@ -5,9 +5,8 @@
 ![Status](https://img.shields.io/badge/status-complete-brightgreen)
 ![Made with](https://img.shields.io/badge/made%20with-HTML%20%7C%20CSS%20%7C%20JS-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
-🔗 **Live Demo:** [network-cable-optimization.vercel.app](https://network-cable-optimization.vercel.app)
+🔗 **Live Demo:** [networkcableoptimization.vercel.app](https://networkcableoptimization.vercel.app)
 
 ---
 
@@ -42,7 +41,7 @@ The optimal solution uses exactly **V − 1** edges with no cycles.
 
 ## 🚀 Live Demo
 
-🔗 **[View Live on Vercel](https://network-cable-optimization.vercel.app)**
+🔗 **[View Live on Vercel](https://networkcableoptimization.vercel.app)**
 
 ---
 
@@ -160,21 +159,6 @@ This project was developed as part of the **Design and Analysis of Algorithms (D
 - 🖼️ Image segmentation
 - 🔌 Circuit board wiring
 - 🌐 Spanning Tree Protocol (STP) in Ethernet switches
-
----
-
-## 🖼️ Screenshots
-
-> _Add screenshots of your visualizer here — Visualizer tab, running Prim's, running Kruskal's, comparison table_
-
-### Visualizer Tab
-![Visualizer](https://via.placeholder.com/800x400?text=Interactive+Visualizer)
-
-### Running Prim's Algorithm
-![Prim's](https://via.placeholder.com/800x400?text=Prim's+Algorithm+Animation)
-
-### Running Kruskal's Algorithm
-![Kruskal's](https://via.placeholder.com/800x400?text=Kruskal's+Algorithm+Animation)
 
 ---
 
