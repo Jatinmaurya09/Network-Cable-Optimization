@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Network Cable Optimization using Minimum Spanning Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">MST</div>
+    <div>
+      <h1>Network Cable Optimization</h1>
+      <p>Minimum Spanning Tree · Prim's &amp; Kruskal's Interactive Visualizer</p>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="viz">🎨 Visualizer</button>
+    <button class="tab" data-view="theory">📘 Theory</button>
+    <button class="tab" data-view="code">💻 Algorithms</button>
+    <button class="tab" data-view="compare">📊 Comparison</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ================= VISUALIZER ================= -->
+  <section id="view-viz" class="view active">
+    <div class="viz-grid">
+
+      <!-- LEFT: CONTROLS -->
+      <aside class="panel">
+        <h3>Interaction Mode</h3>
+        <div class="mode-grid">
+          <button class="mode-btn active" data-mode="move">✋ Move</button>
+          <button class="mode-btn" data-mode="addnode">➕ Node</button>
+          <button class="mode-btn" data-mode="addedge">🔌 Cable</button>
+          <button class="mode-btn" data-mode="delete">🗑 Delete</button>
+        </div>
+
+        <h3>Network Setup</h3>
+        <div class="group">
+          <label>Preset Topology</label>
+          <select id="presetSel">
+            <option value="campus">🏛 College Campus (8 buildings)</option>
+            <option value="office">🏢 Small Office (6 nodes)</option>
+            <option value="hostel">🏠 Hostel Block (7 nodes)</option>
+          </select>
+          <button id="btnLoadPreset" class="btn" style="margin-top:7px">Load Preset</button>
+          <button id="btnRandom" class="btn">🎲 Random Graph</button>
+          <button id="btnClear" class="btn danger">Clear Canvas</button>
+        </div>
+
+        <h3>Prim's Settings</h3>
+        <div class="group">
+          <label>Start Node</label>
+          <select id="startSel"></select>
+        </div>
+
+        <h3>Animation</h3>
+        <div class="group">
+          <label>Speed <span id="speedVal" style="color:var(--cyan)">6</span></label>
+          <input type="range" id="speed" min="1" max="10" value="6" />
+        </div>
+
+        <h3>Run Algorithm</h3>
+        <div class="group">
+          <button id="btnPrim" class="btn primary">▶ Run Prim's</button>
+          <button id="btnKruskal" class="btn primary">▶ Run Kruskal's</button>
+          <div class="row">
+            <button id="btnPause" class="btn">⏸ Pause</button>
+            <button id="btnStep" class="btn">⏭ Step</button>
+          </div>
+          <button id="btnReset" class="btn">↺ Reset</button>
+        </div>
+      </aside>
+
+      <!-- CENTER: CANVAS -->
+      <div class="stage" id="stage">
+        <canvas id="graph"></canvas>
+        <div class="hint" id="hint">Drag nodes to arrange · Click "+ Cable" then two nodes to add a link</div>
+        <div class="legend">
+          <span><i class="dot" style="background:rgba(148,163,184,.5)"></i> Available cable</span>
+          <span><i class="dot" style="background:#fbbf24"></i> Under consideration</span>
+          <span><i class="dot" style="background:#34d399;box-shadow:0 0 8px #34d399"></i> Selected (MST)</span>
+          <span><i class="dot" style="background:#f87171"></i> Rejected (cycle)</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <aside class="panel">
+        <h3>Optimization Result</h3>
+        <div class="stats">
+          <div class="stat"><span id="statTotal">0</span><small>Total Cost</small></div>
+          <div class="stat"><span id="statEdges">0</span><small>Cables Used</small></div>
+        </div>
+        <div id="status" class="status">Idle — load a preset or build your own network.</div>
+
+        <h3>Step-by-Step Log</h3>
+        <div class="log" id="log"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= THEORY ================= -->
+  <section id="view-theory" class="view">
+    <div class="page">
+      <h2>Minimum Spanning Tree — Theory</h2>
+      <p class="sub">Why laying cables is really a graph problem, and how MST solves it optimally.</p>
+
+      <div class="card">
+        <h3>Problem Statement</h3>
+        <p>A campus has <b>N buildings</b> (computers / labs / hostels) that must all be connected to a single network. Laying a cable between any two buildings has a <b>cost</b> (proportional to distance, trenching, material). We must connect <b>every</b> building while laying the <b>minimum total length of cable</b>.</p>
+        <p>Model it as an undirected weighted graph <code class="k">G = (V, E)</code> where vertices = buildings, edges = possible cable routes, and weight = cable cost. The answer is a <b>Minimum Spanning Tree</b>.</p>
+      </div>
+
+      <div class="card">
+        <h3>Key Definitions</h3>
+        <ul>
+          <li><b>Spanning Tree:</b> A subgraph that connects all <code class="k">V</code> vertices using exactly <code class="k">V − 1</code> edges with <b>no cycles</b>.</li>
+          <li><b>Minimum Spanning Tree (MST):</b> A spanning tree whose sum of edge weights is the smallest possible.</li>
+          <li><b>Cut Property:</b> For any cut of the graph, the minimum-weight edge crossing that cut belongs to <i>some</i> MST. → <i>Prim's uses this.</i></li>
+          <li><b>Cycle Property:</b> For any cycle, the maximum-weight edge in it is <i>not</i> in any MST. → <i>Kruskal's uses this.</i></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Why Not Just Connect Everything?</h3>
+        <p>If we used all <code class="k">E</code> edges, the network would contain cycles — redundant cables that cost money but add nothing to connectivity. An MST keeps exactly the <code class="k">V − 1</code> cheapest edges needed for full connectivity. Redundancy is only needed for <i>fault tolerance</i>, which is a different (Steiner / k-edge-connected) problem.</p>
+      </div>
+
+      <div class="card">
+        <h3>Real-World Applications</h3>
+        <ul>
+          <li><b>LAN / campus cabling</b> — the exact problem this project solves.</li>
+          <li><b>Electrical power grid</b> layout minimizing transmission line length.</li>
+          <li><b>Water &amp; gas pipeline</b> networks for a city.</li>
+          <li><b>Road / railway</b> construction connecting towns at minimum cost.</li>
+          <li><b>Clustering</b> in machine learning (single-linkage clustering = Kruskal's).</li>
+          <li><b>Network routing</b> (Spanning Tree Protocol in Ethernet switches).</li>
+          <li><b>Image segmentation</b> and <b>circuit board wiring</b>.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Complexity Summary</h3>
+        <table>
+          <tr><th>Algorithm</th><th>Approach</th><th>Time Complexity</th><th>Best For</th></tr>
+          <tr><td><span class="badge c">Prim's</span></td><td>Grow one tree from a start vertex</td><td>O(E log V) with binary heap<br>O(V²) with adjacency matrix</td><td>Dense graphs</td></tr>
+          <tr><td><span class="badge g">Kruskal's</span></td><td>Sort edges, union-find cycle check</td><td>O(E log E) = O(E log V)</td><td>Sparse graphs</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CODE ================= -->
+  <section id="view-code" class="view">
+    <div class="page">
+      <h2>Algorithm Implementations</h2>
+      <p class="sub">C++ implementations used in the visualizer logic.</p>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Prim's Algorithm</h3>
+          <p>Grows the MST one vertex at a time, always picking the cheapest edge that connects a vertex <i>inside</i> the tree to one <i>outside</i>.</p>
+<pre><span class="c">// Prim's — Min Heap + Adjacency List</span>
+<span class="c">// Time: O(E log V)</span>
+
+<span class="kw">int</span> <span class="fn">prim</span>(<span class="kw">int</span> V, vector&lt;vector&lt;pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt;&gt;&amp; adj, <span class="kw">int</span> src) {
+    priority_queue&lt;pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;,
+        vector&lt;pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt;,
+        greater&lt;&gt;&gt; pq;              <span class="c">// {weight, node}</span>
+
+    vector&lt;<span class="kw">bool</span>&gt; inMST(V, <span class="kw">false</span>);
+    pq.push({<span class="n">0</span>, src});
+
+    <span class="kw">int</span> totalCost = <span class="n">0</span>;
+
+    <span class="kw">while</span> (!pq.empty()) {
+        <span class="kw">auto</span> [w, u] = pq.top(); pq.pop();
+        <span class="kw">if</span> (inMST[u]) <span class="kw">continue</span>;   <span class="c">// stale entry</span>
+
+        inMST[u]  = <span class="kw">true</span>;
+        totalCost += w;              <span class="c">// cable laid</span>
+
+        <span class="kw">for</span> (<span class="kw">auto</span>&amp; [v, wt] : adj[u])
+            <span class="kw">if</span> (!inMST[v])
+                pq.push({wt, v});
+    }
+    <span class="kw">return</span> totalCost;
+}</pre>
+        </div>
+
+        <div class="card">
+          <h3>Kruskal's Algorithm</h3>
+          <p>Sorts all edges by weight and greedily accepts an edge if it doesn't form a cycle. Uses <b>Union-Find (DSU)</b> for fast cycle detection.</p>
+<pre><span class="c">// Kruskal's — DSU + Sorting</span>
+<span class="c">// Time: O(E log E)</span>
+
+<span class="kw">struct</span> DSU {
+    vector&lt;<span class="kw">int</span>&gt; p, r;
+    DSU(<span class="kw">int</span> n): p(n), r(n,<span class="n">0</span>) {
+        iota(p.begin(), p.end(), <span class="n">0</span>);
+    }
+    <span class="kw">int</span> <span class="fn">find</span>(<span class="kw">int</span> x) {
+        <span class="kw">return</span> p[x] == x ? x : p[x] = find(p[x]);
+    }
+    <span class="kw">bool</span> <span class="fn">unite</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+        a = find(a); b = find(b);
+        <span class="kw">if</span> (a == b) <span class="kw">return</span> <span class="kw">false</span>;   <span class="c">// cycle!</span>
+        <span class="kw">if</span> (r[a] &lt; r[b]) swap(a, b);
+        p[b] = a;
+        <span class="kw">if</span> (r[a] == r[b]) r[a]++;
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+};
+
+<span class="kw">int</span> <span class="fn">kruskal</span>(<span class="kw">int</span> V, vector&lt;Edge&gt;&amp; edges) {
+    sort(edges.begin(), edges.end(),
+         [](Edge&amp; a, Edge&amp; b){ <span class="kw">return</span> a.w &lt; b.w; });
+
+    DSU dsu(V);
+    <span class="kw">int</span> totalCost = <span class="n">0</span>, used = <span class="n">0</span>;
+
+    <span class="kw">for</span> (<span class="kw">auto</span>&amp; e : edges) {
+        <span class="kw">if</span> (dsu.unite(e.u, e.v)) {
+            totalCost += e.w;
+            <span class="kw">if</span> (++used == V - <span class="n">1</span>) <span class="kw">break</span>;
+        }
+    }
+    <span class="kw">return</span> totalCost;
+}</pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Dry Run Example</h3>
+        <p>Consider 4 buildings with cable costs: <code class="k">A–B = 1</code>, <code class="k">B–C = 2</code>, <code class="k">A–C = 3</code>, <code class="k">C–D = 4</code>.</p>
+        <p><b>Kruskal's:</b> sort → A–B(1) ✅ accept, B–C(2) ✅ accept, A–C(3) ❌ reject (A,B,C already connected), C–D(4) ✅ accept. Total = 1 + 2 + 4 = <b>7</b>, using 3 cables for 4 buildings.</p>
+        <p><b>Prim's</b> (start at A): add A–B(1) → add B–C(2) → cheapest crossing edge from {A,B,C} is C–D(4) → total <b>7</b>. Same MST, different order.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COMPARISON ================= -->
+  <section id="view-compare" class="view">
+    <div class="page">
+      <h2>Prim's vs Kruskal's</h2>
+      <p class="sub">Both are greedy algorithms that always produce a minimum spanning tree — but they get there differently.</p>
+
+      <div class="card">
+        <table>
+          <tr>
+            <th>Aspect</th><th>Prim's Algorithm</th><th>Kruskal's Algorithm</th>
+          </tr>
+          <tr><td><b>Strategy</b></td><td>Vertex-based: grows a single tree outward</td><td>Edge-based: builds a forest, merges components</td></tr>
+          <tr><td><b>Greedy choice</b></td><td>Min-weight edge leaving the current tree (cut property)</td><td>Globally smallest edge that doesn't form a cycle (cycle property)</td></tr>
+          <tr><td><b>Data Structures</b></td><td>Min-heap / priority queue, visited array</td><td>Sorted edge list, Union-Find (DSU)</td></tr>
+          <tr><td><b>Time Complexity</b></td><td><span class="badge c">O(E log V)</span> binary heap<br>O(V²) adjacency matrix</td><td><span class="badge g">O(E log E)</span> dominated by sorting</td></tr>
+          <tr><td><b>Space</b></td><td>O(V + E)</td><td>O(V + E) + sorted list</td></tr>
+          <tr><td><b>Graph density</b></td><td>Faster on <b>dense</b> graphs</td><td>Faster on <b>sparse</b> graphs</td></tr>
+          <tr><td><b>Disconnected graph</b></td><td>Produces MST of one component only</td><td>Naturally produces a <b>minimum spanning forest</b></td></tr>
+          <tr><td><b>Intermediate state</b></td><td>Always one connected tree</td><td>Multiple disconnected fragments</td></tr>
+          <tr><td><b>Start vertex needed?</b></td><td>Yes (result cost is same regardless)</td><td>No</td></tr>
+          <tr><td><b>Best suited for</b></td><td>Dense networks, adjacency-matrix input</td><td>Sparse networks, pre-sorted edge lists</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Which One Should You Use?</h3>
+        <p>For a real campus cable layout, the graph is usually <b>sparse</b> (each building connects to only a few nearby buildings), so <b>Kruskal's</b> is typically the practical choice. However, if the network is densely meshed (E ≈ V²), <b>Prim's with a binary heap</b> performs better.</p>
+        <p>In this project, both algorithms are implemented and produce the <b>same total cable cost</b> — only the order in which edges are selected differs. This is a consequence of the MST uniqueness theorem: if all edge weights are distinct, the MST is <b>unique</b>.</p>
+      </div>
+
+      <div class="card">
+        <h3>Project Conclusion</h3>
+        <ul>
+          <li>Network cable optimization maps directly onto the Minimum Spanning Tree problem.</li>
+          <li>Both Prim's and Kruskal's correctly find the optimal cable layout with a greedy approach.</li>
+          <li>The total cable cost is minimized while full connectivity is guaranteed.</li>
+          <li>For <code class="k">V</code> buildings, exactly <code class="k">V − 1</code> cable links are required — no more, no less.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= EDGE WEIGHT DIALOG ================= -->
+<div class="dialog hidden" id="edgeDialog">
+  <div class="dialog-box">
+    <h4>Set Cable Cost</h4>
+    <p id="dialogSub">Cost of laying cable between the two selected nodes</p>
+    <input type="number" id="edgeWeight" min="1" max="999" value="5" />
+    <div class="dialog-btns">
+      <button class="btn" id="edgeCancel" style="margin:0">Cancel</button>
+      <button class="btn primary" id="edgeOk" style="margin:0">Add Cable</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
